@@ -225,4 +225,3 @@ frontend/scripts/.artifacts/
 install-*.log
 uninstall-*.log
 *.core
-config.bat
