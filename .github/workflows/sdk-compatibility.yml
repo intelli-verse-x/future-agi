@@ -57,10 +57,10 @@ jobs:
       PG_USER: postgres
       PG_PASSWORD: postgres
       TESTING: "false"
-      EE_REPO_READ_TOKEN: ${{ secrets.EE_REPO_READ_TOKEN || secrets.ORG_READ_TOKEN }}
+      EE_REPO_READ_TOKEN: ${{ github.repository == 'future-agi/future-agi' && (secrets.EE_REPO_READ_TOKEN || secrets.ORG_READ_TOKEN) || '' }}
       EE_REPO_BRANCH: ${{ github.head_ref || github.ref_name }}
       EE_BASE_REF: ${{ github.base_ref || github.ref_name || 'dev' }}
-      SDK_REPO_READ_TOKEN: ${{ secrets.SDK_REPO_READ_TOKEN || '' }}
+      SDK_REPO_READ_TOKEN: ${{ github.repository == 'future-agi/future-agi' && secrets.SDK_REPO_READ_TOKEN || '' }}
       SDK_REF_INPUT: ${{ github.event.inputs['sdk-ref'] || '' }}
       SDK_HEAD_REF: ${{ github.head_ref || github.ref_name }}
       SDK_BASE_REF: ${{ github.base_ref || github.ref_name }}
