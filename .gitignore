@@ -177,7 +177,6 @@ media/
 # IDE / editor / OS
 # ----------------------------------------------------------------------------
 
-.vscode/
 .cursor/
 .idea/
 
@@ -225,3 +224,4 @@ frontend/scripts/.artifacts/
 install-*.log
 uninstall-*.log
 *.core
+config.bat

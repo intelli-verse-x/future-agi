@@ -9,9 +9,9 @@
     "node": ">=22.18.0"
   },
   "scripts": {
-    "dev": "vite",
-    "start": "vite preview",
-    "build": "node --max-old-space-size=8192 ./node_modules/.bin/vite build",
+    "dev": "node init && vite",
+    "start": "node init && vite preview",
+    "build": "node init && node --max-old-space-size=8192 ./node_modules/.bin/vite build",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
     "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
@@ -36,9 +36,9 @@
     "re:start": "yarn rm:all && yarn install && yarn dev",
     "re:build": "yarn rm:all && yarn install && node --max-old-space-size=8192 ./node_modules/.bin/vite build",
     "re:build-npm": "npm run rm:all && npm install && npm run build",
-    "dev:host": "vite --host",
+    "dev:host": "node init && vite --host",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "node --max-old-space-size=4096 ./node_modules/.bin/storybook build"
+    "build-storybook": "node init && node --max-old-space-size=4096 ./node_modules/.bin/storybook build"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.5",
