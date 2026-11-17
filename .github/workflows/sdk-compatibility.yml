@@ -57,10 +57,10 @@ jobs:
       PG_USER: postgres
       PG_PASSWORD: postgres
       TESTING: "false"
-      EE_REPO_READ_TOKEN: ${{ secrets.EE_REPO_READ_TOKEN || secrets.ORG_READ_TOKEN }}
+      EE_REPO_READ_TOKEN: ${{ github.repository == 'future-agi/future-agi' && (secrets.EE_REPO_READ_TOKEN || secrets.ORG_READ_TOKEN) || '' }}
       EE_REPO_BRANCH: ${{ github.head_ref || github.ref_name }}
       EE_BASE_REF: ${{ github.base_ref || github.ref_name || 'dev' }}
-      SDK_REPO_READ_TOKEN: ${{ secrets.SDK_REPO_READ_TOKEN || '' }}
+      SDK_REPO_READ_TOKEN: ${{ github.repository == 'future-agi/future-agi' && secrets.SDK_REPO_READ_TOKEN || '' }}
       SDK_REF_INPUT: ${{ github.event.inputs['sdk-ref'] || '' }}
       SDK_HEAD_REF: ${{ github.head_ref || github.ref_name }}
       SDK_BASE_REF: ${{ github.base_ref || github.ref_name }}
@@ -196,16 +196,27 @@ jobs:
         working-directory: futureagi-sdk
         run: |
           ln -sfn "${GITHUB_WORKSPACE}" "${GITHUB_WORKSPACE}/future-agi"
-          ./scripts/generate-oss-sdk.sh "${GITHUB_WORKSPACE}/api_contracts/openapi/swagger.json"
+          # Use the SDK's current, supported contract-slice and generator entry points.
+          # Running generate.py alone would reuse the SDK's committed contract.
+          BACKEND_PYTHON="${GITHUB_WORKSPACE}/futureagi/.venv/bin/python"
+          "$BACKEND_PYTHON" sdkgen/sync_contract.py "${GITHUB_WORKSPACE}/api_contracts/openapi/swagger.json"
+          "$BACKEND_PYTHON" sdkgen/generate.py
+          python - <<'PYTHON'
+          import hashlib, json, os
+          from pathlib import Path
+          source = Path(os.environ["GITHUB_WORKSPACE"]) / "api_contracts/openapi/swagger.json"
+          generated = json.loads(Path("sdkgen/contracts/swagger.json").read_text())
+          assert generated["x-source-sha256"] == hashlib.sha256(source.read_bytes()).hexdigest(), "SDK contract must come from this backend"
+          PYTHON
           if ! git diff --quiet \
-            openapi/sdk/generated \
-            python/fi/generated/openapi_client \
-            typescript/futureagi/src/generated/openapi; then
+            sdkgen/contracts/swagger.json \
+            python/fi/platform \
+            typescript/futureagi/src/platform; then
             echo "::notice::Generated SDK clients differ from the checked-out SDK ref; testing the generated clients from this backend contract."
             git diff --stat \
-              openapi/sdk/generated \
-              python/fi/generated/openapi_client \
-              typescript/futureagi/src/generated/openapi
+              sdkgen/contracts/swagger.json \
+              python/fi/platform \
+              typescript/futureagi/src/platform
           fi
 
       - name: Install Python SDK test dependencies

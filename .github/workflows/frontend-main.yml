@@ -38,7 +38,7 @@ jobs:
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
-        if: always()
+        if: always() && github.repository == 'future-agi/future-agi'
         with:
           file: ./frontend/coverage/lcov.info
           flags: main-branch

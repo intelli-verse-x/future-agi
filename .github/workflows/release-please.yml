@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   release-please:
+    if: github.repository == 'future-agi/future-agi'
     runs-on: ubuntu-latest
     steps:
       # App token (not GITHUB_TOKEN): the tag push must trigger release-images.yml,
